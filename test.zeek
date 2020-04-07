@@ -1,13 +1,9 @@
-# 404 response 的数量
-# 所有响应的数量
-# 不同url的404响应的数量
-
 global t : table[addr] of record{
     count_all: count;
     count_404: count;
     count_404_uni: count;
     url: set[string];
-};
+} &read_expire = 10min;
 
 event http_reply(c: connection, version: string, code: count, reason: string)
 {
@@ -20,7 +16,7 @@ event http_reply(c: connection, version: string, code: count, reason: string)
 		++t[c$id$orig_h]$count_all;
 	}
 
-	if(code == 304)
+	if(code == 404)
 	{
 		++t[c$id$orig_h]$count_404;
 		if(HTTP::build_url_http(c$http) !in t[c$id$orig_h]$url)
@@ -29,8 +25,6 @@ event http_reply(c: connection, version: string, code: count, reason: string)
 			++t[c$id$orig_h]$count_404_uni;
 		}
 	}
-	
-	
 }
 
 event zeek_done()
