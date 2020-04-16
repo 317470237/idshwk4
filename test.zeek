@@ -7,16 +7,17 @@ global t: table[addr] of record{
 global oritime: time;
 global iinterval: interval;
 
+event zeek_init()
+{
+	oritime=current_time();
+}
+
 event http_reply(c: connection, version: string, code: count, reason: string)
 {
-	if(|t| == 0)
+	iinterval = current_time() - oritime;
+	if(iinterval >= 10min)
 	{
 		oritime = current_time();
-	}
-	iinterval = current_time() - oritime;
-	
-	if(iinterval>=10 min)
-	{
 		for(a in t)
 		{
 			if(t[a]$count_all>2)
@@ -31,7 +32,6 @@ event http_reply(c: connection, version: string, code: count, reason: string)
 			}
 		}
 		t = table();
-		oritime = current_time();
 	}
 	
 	if ( c$id$orig_h !in t )
