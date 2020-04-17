@@ -51,9 +51,9 @@ event http_reply(c: connection, version: string, code: count, reason: string)
 	if(code == 404)
 	{
 		++t[c$id$orig_h]$count_404;
-		if(HTTP::build_url_http(c$http) !in t[c$id$orig_h]$url)
+		if(c$http$uri !in t[c$id$orig_h]$url)
 		{
-			add t[c$id$orig_h]$url[HTTP::build_url_http(c$http)];
+			add t[c$id$orig_h]$url[c$http$uri];
 			++t[c$id$orig_h]$count_404_uni;
 		}
 	}
