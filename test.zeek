@@ -1,7 +1,7 @@
 global t: table[addr] of record{
-    count_all: count;
-    count_404: count;
-    count_404_uni: count;
+    count_all: double;
+    count_404: double;
+    count_404_uni: double;
     url: set[string];
 };
 global oritime: time;
@@ -26,7 +26,7 @@ function output()
 
 event zeek_init()
 {
-	oritime=current_time();
+	oritime = current_time();
 }
 
 event http_reply(c: connection, version: string, code: count, reason: string)
@@ -45,16 +45,16 @@ event http_reply(c: connection, version: string, code: count, reason: string)
 	}
 	else
 	{
-		++t[c$id$orig_h]$count_all;
+		t[c$id$orig_h]$count_all += 1;
 	}
 
 	if(code == 404)
 	{
-		++t[c$id$orig_h]$count_404;
-		if(c$http$uri !in t[c$id$orig_h]$url)
+		t[c$id$orig_h]$count_404 += 1;
+		if(HTTP::build_url_http(c$http) !in t[c$id$orig_h]$url)
 		{
-			add t[c$id$orig_h]$url[c$http$uri];
-			++t[c$id$orig_h]$count_404_uni;
+			add t[c$id$orig_h]$url[HTTP::build_url_http(c$http)];
+			t[c$id$orig_h]$count_404_uni += 1;
 		}
 	}
 }
